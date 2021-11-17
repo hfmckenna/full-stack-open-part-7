@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Switch,
   Route,
@@ -7,6 +7,7 @@ import {
   useHistory,
   useLocation
 } from 'react-router-dom'
+import { useField } from './hooks'
 
 const Menu = () => {
   const padding = {
@@ -34,9 +35,17 @@ const AnecdoteList = ({ anecdotes }) => {
   const { state } = useLocation()
   const [showMessage, setShowMessage] = useState(true)
 
-  setTimeout(() => {
-    setShowMessage(false)
-  }, 10000)
+  useEffect(() => {
+    let isMounted = true
+    setTimeout(() => {
+      if (isMounted) {
+        setShowMessage(false)
+      }
+    }, 10000)
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   return (
     <div>
@@ -49,7 +58,7 @@ const AnecdoteList = ({ anecdotes }) => {
       <ul>
         {anecdotes.map((anecdote) => (
           <li key={anecdote.id}>
-            <a href={`/anecdotes/${anecdote.id}`}>{anecdote.content}</a>
+            <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
           </li>
         ))}
       </ul>
@@ -59,7 +68,9 @@ const AnecdoteList = ({ anecdotes }) => {
 
 const Anecdote = ({ anecdotes }) => {
   const id = useParams().id
-  const anecdote = anecdotes.find((n) => Number(n.id) === Number(id))
+  const anecdote = anecdotes.find((n) => {
+    return Number(n.id) === Number(id)
+  })
   return (
     <div>
       <h2>
@@ -67,7 +78,7 @@ const Anecdote = ({ anecdotes }) => {
       </h2>
       <p>has {anecdote.votes} votes</p>
       <div>
-        for more info see <a href={anecdote.info}>{anecdote.info}</a>
+        for more info see <Link to={anecdote.info}>{anecdote.info}</Link>
       </div>
     </div>
   )
@@ -97,35 +108,42 @@ const About = () => (
 
 const Footer = () => (
   <div>
-    Anecdote app for{' '}
+    Anecdote app for
     <a href="https://courses.helsinki.fi/fi/tkt21009">
       Full Stack -websovelluskehitys
     </a>
-    . See{' '}
+    . See
     <a href="https://github.com/fullstack-hy/routed-anecdotes/blob/master/src/App.js">
       https://github.com/fullstack-hy2019/routed-anecdotes/blob/master/src/App.js
-    </a>{' '}
+    </a>
     for the source code.
   </div>
 )
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+  const [resetContent, content] = useField('text')
+  const [resetAuthor, author] = useField('text')
+  const [resetInfo, info] = useField('url')
   const history = useHistory()
 
   const handleSubmit = (e) => {
     e.preventDefault()
     const newAnecdote = {
-      content,
-      author,
-      info,
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0
     }
     props.addNew(newAnecdote)
 
-    history.push({ pathname: '/anecdotes?new=true', state: newAnecdote })
+    history.push({ pathname: '/anecdotes', state: newAnecdote })
+  }
+
+  const handleReset = (e) => {
+    e.preventDefault()
+    resetContent()
+    resetAuthor()
+    resetInfo()
   }
 
   return (
@@ -134,29 +152,18 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input
-            name="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          />
+          <input {...content} />
         </div>
         <div>
           author
-          <input
-            name="author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-          />
+          <input {...author} />
         </div>
         <div>
           url for more info
-          <input
-            name="info"
-            value={info}
-            onChange={(e) => setInfo(e.target.value)}
-          />
+          <input {...info} />
         </div>
         <button>create</button>
+        <button onClick={handleReset}>reset</button>
       </form>
     </div>
   )
@@ -179,12 +186,12 @@ const App = () => {
       id: '2'
     }
   ])
-
+  console.log(anecdotes)
   const addNew = (anecdote) => {
-    anecdote.id = (Math.random() * 10000).toFixed(0)
+    anecdote.id = String((Math.random() * 10000).toFixed(0))
     setAnecdotes(anecdotes.concat(anecdote))
   }
-  
+
   return (
     <div>
       <h1>Software anecdotes</h1>
@@ -198,9 +205,6 @@ const App = () => {
         </Route>
         <Route path="/anecdotes/:id">
           <Anecdote anecdotes={anecdotes} />
-        </Route>
-        <Route path="/anecdotes?new=true">
-          <AnecdoteList anecdotes={anecdotes} />
         </Route>
         <Route path="/anecdotes">
           <AnecdoteList anecdotes={anecdotes} />
