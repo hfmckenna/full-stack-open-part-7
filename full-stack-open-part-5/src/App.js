@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import Blog from './components/Blog'
 import Login from './components/Login'
 import CreateBlog from './components/CreateBlog'
 import Toggalable from './components/Toggalable'
-import blogService from './services/blogs'
+import { initializeBlogs } from './reducers/blogReducer'
 
 const App = () => {
+  const dispatch = useDispatch()
+
   const fetchUserStorage = () => {
     return JSON.parse(localStorage.getItem('userData'))
   }
@@ -19,19 +22,16 @@ const App = () => {
     localStorage.removeItem('userData')
   }
 
-  const [blogs, setBlogs] = useState([])
+  useEffect(() => {
+    dispatch(initializeBlogs())
+  }, [dispatch])
+
+  const blogs = useSelector((state) => state.blogs)
+
   const [user, setUser] = useState(fetchUserStorage())
 
   const blogFormRef = useRef()
   const loginFormRef = useRef()
-
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      const latestBlogs = await blogService.getAll()
-      setBlogs(latestBlogs)
-    }
-    fetchBlogs()
-  }, [])
 
   useEffect(() => {
     setUserStorage(user)
@@ -55,18 +55,13 @@ const App = () => {
         <button onClick={destroyUser}>Logout</button>
       </div>
       <Toggalable buttonLabel={'create new blog'} ref={blogFormRef}>
-        <CreateBlog user={user} setBlogs={setBlogs} />
+        <CreateBlog user={user} />
       </Toggalable>
       <div>
         {blogs
           .sort((a, b) => a.likes < b.likes)
           .map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              user={user}
-              setBlogs={setBlogs}
-            />
+            <Blog key={blog.id} blog={blog} user={user} />
           ))}
       </div>
     </div>

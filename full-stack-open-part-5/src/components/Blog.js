@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
-import blogService from '../services/blogs'
+import { useDispatch } from 'react-redux'
+import { likeBlog, deleteBlog } from '../reducers/blogReducer'
 
-const Blog = ({ blog, user, setBlogs }) => {
+const Blog = ({ blog, user }) => {
+  const dispatch = useDispatch()
   const [blogDetailDisplay, setBlogDetailDisplay] = useState(false)
 
   const toggleView = () => {
@@ -11,25 +13,16 @@ const Blog = ({ blog, user, setBlogs }) => {
   const addLike = async () => {
     const newLikes = blog.likes + 1
     try {
-      await blogService.like(blog.id, newLikes, user.token)
-      setBlogs((existingBlogs) => {
-        const filteredBlogs = existingBlogs.filter(
-          (existingBlog) => existingBlog.id !== blog.id
-        )
-        return [...filteredBlogs, { ...blog, likes: newLikes }]
-      })
+      dispatch(likeBlog(blog.id, newLikes, user.token))
     } catch (e) {
       console.error(e)
     }
   }
 
-  const deleteBlog = async () => {
+  const remove = async () => {
     if (window.confirm(`Remove ${blog.title} by ${blog.user.name}?`)) {
       try {
-        await blogService.deleteBlog(blog.id, user.token)
-        setBlogs((existingBlogs) =>
-          existingBlogs.filter((existingBlog) => existingBlog.id !== blog.id)
-        )
+        dispatch(deleteBlog(blog.id, user.token))
       } catch (e) {
         console.error(e)
       }
@@ -56,7 +49,7 @@ const Blog = ({ blog, user, setBlogs }) => {
         <p>{blog.user.name}</p>
         {user.username === blog.user.username && (
           <div>
-            <button onClick={deleteBlog}>Remove</button>
+            <button onClick={remove}>Remove</button>
           </div>
         )}
       </div>

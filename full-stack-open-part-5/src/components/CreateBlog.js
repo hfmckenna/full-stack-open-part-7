@@ -1,21 +1,21 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import blogs from '../services/blogs'
 import { setNotification } from '../reducers/notificationReducer'
+import { createBlog } from '../reducers/blogReducer'
 import Notification from './Notification'
 
-const CreateBlog = ({ user, setBlogs }) => {
+const CreateBlog = ({ user }) => {
   const dispatch = useDispatch()
 
   const notification = useSelector((state) => state.notification)
-
-  const [newBlog, setNewBlog] = useState({
+  const initialBlog = {
     title: '',
     author: '',
     url: '',
     likes: 0,
     user: user
-  })
+  }
+  const [newBlog, setNewBlog] = useState(initialBlog)
 
   const handleBlogChange = (event) => {
     const { name, value } = event.target
@@ -25,18 +25,8 @@ const CreateBlog = ({ user, setBlogs }) => {
   const submitBlog = async (e) => {
     e.preventDefault()
     try {
-      const response = await blogs.create(newBlog, user.token)
-      setBlogs((existingBlogs) => [
-        ...existingBlogs,
-        { ...newBlog, id: response.id }
-      ])
-      setNewBlog({
-        title: '',
-        author: '',
-        url: '',
-        likes: 0,
-        user: user
-      })
+      dispatch(createBlog(newBlog, user.token))
+      setNewBlog(initialBlog)
       dispatch(setNotification('Blog Added', 5000, true))
     } catch (e) {
       dispatch(setNotification('Error', 5000, false))
