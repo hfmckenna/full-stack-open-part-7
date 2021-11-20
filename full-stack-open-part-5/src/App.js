@@ -2,14 +2,13 @@ import React, { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Blogs from './components/Blogs'
 import Login from './components/Login'
-import CreateBlog from './components/CreateBlog'
 import Toggalable from './components/Toggalable'
 import { initializeBlogs } from './reducers/blogReducer'
-import { logout } from './reducers/userReducer'
-import { Link, Route, Switch } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
+import Blog from './components/Blog'
 import User from './components/User'
 import Users from './components/Users'
-import BlogInfo from './components/BlogInfo'
+import Menu from './components/Menu'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -20,7 +19,6 @@ const App = () => {
 
   const user = useSelector((state) => state.user)
 
-  const blogFormRef = useRef()
   const loginFormRef = useRef()
 
   if (user === null) {
@@ -36,19 +34,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-      <Link to="/">
-        home
-      </Link>
-      <Link to="/users">
-        users
-      </Link>
-      <div>
-        <p>{user.name} is logged in</p>
-        <button onClick={() => dispatch(logout())}>Logout</button>
-      </div>
-      <Toggalable buttonLabel={'create new blog'} ref={blogFormRef}>
-        <CreateBlog user={user} />
-      </Toggalable>
+      <Menu />
       <Switch>
         <Route path="/users/:id">
           <User />
@@ -57,7 +43,7 @@ const App = () => {
           <Users />
         </Route>
         <Route path="/blogs/:id">
-          <BlogInfo />
+          <Blog />
         </Route>
         <Route path="/">
           <Blogs />

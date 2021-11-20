@@ -23,7 +23,7 @@ export const createBlog = (content, token) => {
 export const likeBlog = (id, likes, token) => {
   return async (dispatch) => {
     const newBlog = await blogService.like(id, likes, token)
-    console.log(newBlog)
+    console.log('likes:', newBlog)
     dispatch({
       type: 'like',
       data: newBlog

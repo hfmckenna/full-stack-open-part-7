@@ -1,13 +1,24 @@
-import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { likeBlog, deleteBlog } from '../reducers/blogReducer'
+import { useParams } from 'react-router-dom'
 
-const Blog = ({ blog, user }) => {
+const Blog = () => {
   const dispatch = useDispatch()
-  const [blogDetailDisplay, setBlogDetailDisplay] = useState(false)
 
-  const toggleView = () => {
-    setBlogDetailDisplay((current) => !current)
+  const id = useParams().id
+
+  const blogs = useSelector((state) => state.blogs)
+  const user = useSelector((state) => state.user)
+
+  const blog = blogs.find((n) => {
+    return n.id === id
+  })
+
+  console.log(blog)
+
+  if (!blog) {
+    return null
   }
 
   const addLike = async () => {
@@ -36,11 +47,8 @@ const Blog = ({ blog, user }) => {
     >
       <p>
         {blog.title} {blog.author}
-        <button onClick={toggleView}>view</button>
       </p>
-      <div
-        style={blogDetailDisplay ? { display: 'inline' } : { display: 'none' }}
-      >
+      <div>
         <p>{blog.url}</p>
         <p>
           likes {blog.likes}
