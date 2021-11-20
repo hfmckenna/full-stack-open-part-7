@@ -1,7 +1,14 @@
 import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import blogs from '../services/blogs'
+import { setNotification } from '../reducers/notificationReducer'
+import Notification from './Notification'
 
 const CreateBlog = ({ user, setBlogs }) => {
+  const dispatch = useDispatch()
+
+  const notification = useSelector((state) => state.notification)
+
   const [newBlog, setNewBlog] = useState({
     title: '',
     author: '',
@@ -9,8 +16,6 @@ const CreateBlog = ({ user, setBlogs }) => {
     likes: 0,
     user: user
   })
-  const [errorMessage, setErrorMessage] = useState('')
-  const [successMessage, setSuccessMessage] = useState('')
 
   const handleBlogChange = (event) => {
     const { name, value } = event.target
@@ -21,7 +26,6 @@ const CreateBlog = ({ user, setBlogs }) => {
     e.preventDefault()
     try {
       const response = await blogs.create(newBlog, user.token)
-      setSuccessMessage('Blog Added')
       setBlogs((existingBlogs) => [
         ...existingBlogs,
         { ...newBlog, id: response.id }
@@ -33,22 +37,16 @@ const CreateBlog = ({ user, setBlogs }) => {
         likes: 0,
         user: user
       })
-      setTimeout(() => {
-        setSuccessMessage(null)
-      }, 5000)
+      dispatch(setNotification('Blog Added', 5000, true))
     } catch (e) {
-      setErrorMessage(e.message)
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      dispatch(setNotification('Error', 5000, false))
     }
   }
 
   return (
     <div>
       <h2>Create new blog</h2>
-      {errorMessage && <h3 style={{ color: 'red' }}>{errorMessage}</h3>}
-      {successMessage && <h3 style={{ color: 'green' }}>{successMessage}</h3>}
+      {notification.message && <Notification notification={notification} />}
       <form onSubmit={submitBlog}>
         <div>
           <label htmlFor="create-title">title:</label>
