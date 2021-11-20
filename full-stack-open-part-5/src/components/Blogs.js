@@ -13,7 +13,7 @@ const Blogs = () => {
       {blogs
         .sort((a, b) => a.likes < b.likes)
         .map((blog) => (
-          <li style={{ border: '2px solid black', marginBottom: '8px' }}>
+          <li key={blog.id} style={{ border: '2px solid black', marginBottom: '8px' }}>
             <Link key={blog.id} to={`/blogs/${blog.id}`}>
               {blog.title}
             </Link>

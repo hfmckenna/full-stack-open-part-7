@@ -42,6 +42,17 @@ export const deleteBlog = (id, token) => {
   }
 }
 
+export const commentBlog = (id, comment) => {
+  return async (dispatch) => {
+    const commentBlog = await blogService.commentBlog(id, comment)
+    console.log('bloggo:', commentBlog)
+    dispatch({
+      type: 'comment',
+      data: commentBlog
+    })
+  }
+}
+
 const reducer = (state = [], action) => {
   switch (action.type) {
     case 'initBlogs':
@@ -55,6 +66,10 @@ const reducer = (state = [], action) => {
     }
     case 'delete': {
       return state.filter((blog) => blog.id !== action.data)
+    }
+    case 'comment': {
+      const filtered = state.filter((blog) => blog.id !== action.data.id)
+      return [...filtered, action.data]
     }
     default:
       return state

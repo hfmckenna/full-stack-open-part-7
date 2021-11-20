@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { likeBlog, deleteBlog } from '../reducers/blogReducer'
+import { likeBlog, deleteBlog, commentBlog } from '../reducers/blogReducer'
 import { useParams } from 'react-router-dom'
 
 const Blog = () => {
   const dispatch = useDispatch()
-
+  const [comment, setComment] = useState('')
   const id = useParams().id
 
   const blogs = useSelector((state) => state.blogs)
@@ -14,8 +14,6 @@ const Blog = () => {
   const blog = blogs.find((n) => {
     return n.id === id
   })
-
-  console.log(blog)
 
   if (!blog) {
     return null
@@ -40,6 +38,10 @@ const Blog = () => {
     }
   }
 
+  const handleComment = async () => {
+    dispatch(commentBlog(blog.id, comment))
+  }
+
   return (
     <div
       className={'post-info'}
@@ -61,6 +63,22 @@ const Blog = () => {
           </div>
         )}
       </div>
+      <h3>comments</h3>
+      <div>
+        <input
+          type="text"
+          value={comment}
+          onChange={(e) => {
+            setComment(e.target.value)
+          }}
+        />
+        <button onClick={handleComment}>Comment Me!</button>
+      </div>
+      <ul>
+        {blog?.comments.map((comment, i) => (
+          <li key={`${i}${comment}`}>{comment}</li>
+        ))}
+      </ul>
     </div>
   )
 }
