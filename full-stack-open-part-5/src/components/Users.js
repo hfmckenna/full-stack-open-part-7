@@ -1,5 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 const Users = () => {
   const blogs = useSelector((state) => state.blogs)
@@ -18,7 +19,6 @@ const Users = () => {
   }
 
   const countOfBlogsByUser = getCount(blogs)
-  console.log(countOfBlogsByUser)
 
   return (
     <div>
@@ -33,7 +33,7 @@ const Users = () => {
           {countOfBlogsByUser.map(({ id, timesListed }) => {
             return (
               <tr key={id}>
-                <td>{getName(id)}</td>
+                <td><Link to={`/users/${id}`}>{getName(id)}</Link></td>
                 <td>{timesListed}</td>
               </tr>
             )
