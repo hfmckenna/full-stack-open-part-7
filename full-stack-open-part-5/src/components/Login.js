@@ -33,19 +33,23 @@ const Login = () => {
             type="text"
             value={username}
             name="Username"
+            className="border-solid border-2"
             onChange={({ target }) => setUsername(target.value)}
           />
         </div>
-        <div>
+        <div className="">
           password
           <input
             type="password"
             value={password}
             name="Password"
+            className="border-solid border-2 border-black"
             onChange={({ target }) => setPassword(target.value)}
           />
         </div>
-        <button type="submit">login</button>
+        <button className="border-solid border-2 border-black" type="submit">
+          login
+        </button>
       </form>
     </div>
   )

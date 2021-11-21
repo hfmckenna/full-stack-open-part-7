@@ -43,11 +43,8 @@ const Blog = () => {
   }
 
   return (
-    <div
-      className={'post-info'}
-      style={{ border: '2px solid black', marginBottom: '8px' }}
-    >
-      <p>
+    <div className="p-4 border-solid">
+      <p className="p-2">
         {blog.title} {blog.author}
       </p>
       <div>

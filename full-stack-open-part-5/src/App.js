@@ -24,7 +24,7 @@ const App = () => {
   if (user === null) {
     return (
       <>
-        <h2>Log in to blogs</h2>
+        <h2 className="uppercase">Log in to blogs</h2>
         <Toggalable buttonLabel={'login'} ref={loginFormRef}>
           <Login />
         </Toggalable>
@@ -33,7 +33,7 @@ const App = () => {
   }
   return (
     <div>
-      <h2>blogs</h2>
+      <h2 className="uppercase">blogs</h2>
       <Menu />
       <Switch>
         <Route path="/users/:id">
